@@ -2,27 +2,20 @@ package com.example.projetoescola.repositories;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.example.projetoescola.models.Curso;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
 @Repository
-public class CursoRepository {
+public interface CursoRepository extends JpaRepository<Curso, Long> {
+    List<Curso> findByNomeLike(String nome);
 
-    @Autowired
-    private EntityManager entityManager;
+    List<Curso> findByCargaHorariaGreaterThanEqual(Integer cargaHoraria);
 
-    @Transactional
-    public Curso salvar(Curso curso) {
-        curso = entityManager.merge(curso);
-        return curso;
-    }
+    List<Curso> findByNomeAndCargaHorariaGreaterThanEqual(String nome, Integer cargaHoraria);
 
-    public List<Curso> obterTodos() {
-        return entityManager.createQuery("from Curso", Curso.class).getResultList();
-    }
+    @Query("SELECT c FROM Curso c WHERE c.categoriaCurso.id = :idCategoria")
+    List<Curso> findByIdCategoria(Integer idCategoria);
 }
